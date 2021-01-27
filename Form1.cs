@@ -53,7 +53,6 @@ namespace DesktopMascot
              //ESCキーを押したら終了
             if (DX.CheckHitKey(DX.KEY_INPUT_ESCAPE) != 0)
             {
-                DX.DxLib_End();
                 Close();
             }
 
@@ -99,9 +98,20 @@ namespace DesktopMascot
             }
         }
 
+        private void ChangeModel(string model_path)
+        {
+            modelHandle = DX.MV1LoadModel(model_path);
+        }
+
+        private void ChangeMotion(string motion_path)
+        {
+            //
+        }
+
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             DX.DxLib_End(); //DxLibの終了処理
+            Application.Exit();
         }
 
         private void Form1_Shown(object sender, EventArgs e)
@@ -109,5 +119,65 @@ namespace DesktopMascot
             FormBorderStyle = FormBorderStyle.None; //フォームの枠を非表示にする
             TransparencyKey = Color.FromArgb(1, 1, 1); //透過色を設定
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DX.DxLib_End();
+            Application.Exit();
+        }
+
+        /*
+         private void cameraToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_Camera dialog1 = new Dialog_Camera();
+            dialog1.Show();             // Show the dialog window for setting camera works
+        }
+
+        private void motionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_Motions dialog1 = new Dialog_Motions();
+            dialog1.Show();             // Show the dialog window to select the motion
+        }
+
+        private void modelsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_Models dialog1 = new Dialog_Models();
+            dialog1.Show();             // Show the dialog window to selkect the model
+        }
+
+        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
+        {
+            contextMenuStrip1.Show(Cursor.Position.X - 10, Cursor.Position.Y - 10);
+        }
+
+        private void topMostToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_DisplayMode dialog1 = new Dialog_DisplayMode();
+            dialog1.Show();             // Show dialog window to set the top most display
+        }
+
+        private void physicsCalcToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_PhysicsMode dialog1 = new Dialog_PhysicsMode();
+            dialog1.Show();             // Show dialog window to set the physics calc. mode
+        }
+
+        private void settingWindowPosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_WindowPos dialog1 = new Dialog_WindowPos();
+            DialogResult result = dialog1.ShowDialog();         // Show dialog window to set the position for the dialog window
+            if (result == DialogResult.OK)
+            {
+                WinPos_X = int.Parse(dialog1.textBox_X.Text);
+                WinPos_Y = int.Parse(dialog1.textBox_Y.Text);
+            }
+        }
+
+        private void scheduleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Dialog_Schedule dialog1 = new Dialog_Schedule();
+            dialog1.Show();             // Show dialog window to set the motion speed
+        }
+        */
     }
 }

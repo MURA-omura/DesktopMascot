@@ -1,5 +1,4 @@
-﻿
-namespace DesktopMascot
+﻿namespace DesktopMascot
 {
     partial class Form1
     {
@@ -38,6 +37,7 @@ namespace DesktopMascot
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.ResumeLayout(false);
 
