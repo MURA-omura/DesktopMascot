@@ -7,6 +7,8 @@ namespace DesktopMascot
 {
     public partial class Form1 : Form
     {
+        private NotifyIcon notify_icon;
+
         private int modelHandle;
 
         public float camera_X = 0.0f;
@@ -26,6 +28,8 @@ namespace DesktopMascot
 
             ClientSize = new Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height); //画面サイズの設定
             Text = "DesktopMascot"; //ウインドウの名前を設定
+            ShowInTaskbar = false;
+            SetComponents();
 
             DX.SetOutApplicationLogValidFlag(DX.FALSE); //Log.txtを生成しないように設定
             DX.SetUserWindow(Handle); //DxLibの親ウインドウをこのフォームに設定
@@ -41,20 +45,36 @@ namespace DesktopMascot
             DX.SetCameraPositionAndTarget_UpVecY(DX.VGet(camera_X, camera_Y, camera_Z), DX.VGet(0.0f, 10.0f, 0.0f)); //第1引数の位置から第2引数の位置を見る角度にカメラを設置
         }
 
+        private void SetComponents()
+        {
+            notify_icon = new NotifyIcon();
+            // アイコンの設定
+            notify_icon.Icon = new Icon("./DesktopMascot.ico");
+            // アイコンを表示する
+            notify_icon.Visible = true;
+            // アイコンにマウスポインタを合わせたときのテキスト
+            notify_icon.Text = "DesktopMascot";
+
+            // コンテキストメニュー
+            ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
+            ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem.Text = "終了";
+            toolStripMenuItem.Click += ExitToolStripMenuItem_Click;
+            contextMenuStrip.Items.Add(toolStripMenuItem);
+
+            notify_icon.ContextMenuStrip = contextMenuStrip;
+
+            // NotifyIconのクリックイベント
+            notify_icon.Click += NotifyIconMouseClick;
+        }
+
         public void MainLoop()
         {
             DX.ClearDrawScreen(); //裏画面を消す
             DX.DrawBox(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, DX.GetColor(1, 1, 1), DX.TRUE); //背景を設定(透過させる)
 
             MoveModel();
-
             DX.MV1DrawModel(modelHandle); //3Dモデルの描画
-
-             //ESCキーを押したら終了
-            if (DX.CheckHitKey(DX.KEY_INPUT_ESCAPE) != 0)
-            {
-                Close();
-            }
 
             DX.ScreenFlip(); //裏画面を表画面にコピー
         }
@@ -120,10 +140,15 @@ namespace DesktopMascot
             TransparencyKey = Color.FromArgb(1, 1, 1); //透過色を設定
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DX.DxLib_End();
             Application.Exit();
+        }
+
+        private void NotifyIconMouseClick(object sender, EventArgs e)
+        {
+            notify_icon.ContextMenuStrip.Show(Cursor.Position.X - 10, Cursor.Position.Y - 10);
         }
 
         /*
@@ -143,11 +168,6 @@ namespace DesktopMascot
         {
             Dialog_Models dialog1 = new Dialog_Models();
             dialog1.Show();             // Show the dialog window to selkect the model
-        }
-
-        private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
-        {
-            contextMenuStrip1.Show(Cursor.Position.X - 10, Cursor.Position.Y - 10);
         }
 
         private void topMostToolStripMenuItem_Click(object sender, EventArgs e)
