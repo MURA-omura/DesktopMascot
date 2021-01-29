@@ -5,15 +5,18 @@ using DxLibDLL;
 
 namespace DesktopMascot
 {
-    public partial class Form1 : Form
+    sealed public partial class Form1 : Form
     {
         private NotifyIcon notify_icon;
 
-        private int modelHandle;
+        private static int modelHandle;
+        private static string model_path;
 
         public static float camera_dist = 50.0f;
         public static float camera_theta = 0.0f;
         public static float camera_phi = 0.0f;
+
+        public static int phy_mode = 0;
 
         private bool mouse_flag = false;
         private int mouse_orgX;
@@ -39,10 +42,37 @@ namespace DesktopMascot
             DX.DxLib_Init(); //DxLibの初期化処理
             DX.SetDrawScreen(DX.DX_SCREEN_BACK); //描画先を裏画面に設定
 
-            modelHandle = DX.MV1LoadModel("Data/さくらみこ2公式mmd_ver1.0/さくらみこ2.pmx"); //3Dモデルの読み込み
+            model_path = "Data/さくらみこ2公式mmd_ver1.0/さくらみこ2.pmx";
+            modelHandle = DX.MV1LoadModel(model_path); //3Dモデルの読み込み
 
             DX.SetCameraNearFar(0.1f, 1000.0f); //奥行0.1～1000をカメラの描画範囲とする
             DX.SetCameraPositionAndTarget_UpVecY(CameraDialog.SphereToCube(camera_dist, camera_theta, camera_phi), DX.VGet(0.0f, 10.0f, 0.0f)); //第1引数の位置から第2引数の位置を見る角度にカメラを設置
+        }
+
+        public static void SetPhyMode(int phy_flag)
+        {
+            phy_mode = phy_flag;
+            if (phy_flag == -1)
+            {
+                DX.MV1PhysicsResetState(modelHandle);
+                DX.MV1SetLoadModelPhysicsCalcPrecision(0);      // Calculation accuracy  0: Default(60FPS), 1: 120FPS, 2: 240FPS, 3: 480FPS, 4: 960FPS, 5: 1920FPS  
+                DX.MV1SetLoadModelUsePhysicsMode(DX.DX_LOADMODEL_PHYSICS_REALTIME);
+            }
+            if (phy_flag == 1)
+            {
+                DX.MV1PhysicsResetState(modelHandle);
+                DX.MV1SetLoadModelPhysicsCalcPrecision(0);
+                DX.MV1SetLoadModelUsePhysicsMode(DX.DX_LOADMODEL_PHYSICS_LOADCALC);
+            }
+            if (phy_flag == 0)
+            {
+                DX.MV1PhysicsResetState(modelHandle);
+                DX.MV1SetLoadModelUsePhysicsMode(DX.DX_LOADMODEL_PHYSICS_DISABLE);
+            }
+            modelHandle = DX.MV1LoadModel(model_path);
+            //MaxMotions = DX.MV1GetAnimNum(modelHandle);
+            //attachIndex = DX.MV1AttachAnim(modelHandle, MotionNo, -1, DX.FALSE);
+            //totalTime = DX.MV1GetAttachAnimTotalTime(modelHandle, attachIndex);
         }
 
         private void SetComponents()
@@ -57,14 +87,31 @@ namespace DesktopMascot
 
             // コンテキストメニュー
             ContextMenuStrip contextMenuStrip = new ContextMenuStrip();
-            ToolStripMenuItem exitToolStripMenuItem = new ToolStripMenuItem();
-            exitToolStripMenuItem.Text = "終了";
-            exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
-            contextMenuStrip.Items.Add(exitToolStripMenuItem);
+            
             ToolStripMenuItem cameraToolStripMenuItem = new ToolStripMenuItem();
             cameraToolStripMenuItem.Text = "カメラ位置";
             cameraToolStripMenuItem.Click += CameraToolStripMenuItem_Click;
             contextMenuStrip.Items.Add(cameraToolStripMenuItem);
+
+            ToolStripMenuItem modelToolStripMenuItem = new ToolStripMenuItem();
+            modelToolStripMenuItem.Text = "モデル";
+            modelToolStripMenuItem.Click += ModelToolStripMenuItem_Click;
+            contextMenuStrip.Items.Add(modelToolStripMenuItem);
+
+            ToolStripMenuItem motionToolStripMenuItem = new ToolStripMenuItem();
+            motionToolStripMenuItem.Text = "モーション";
+            motionToolStripMenuItem.Click += MotionToolStripMenuItem_Click;
+            contextMenuStrip.Items.Add(motionToolStripMenuItem);
+
+            ToolStripMenuItem physicToolStripMenuItem = new ToolStripMenuItem();
+            physicToolStripMenuItem.Text = "物理演算";
+            physicToolStripMenuItem.Click += PhysicToolStripMenuItem_Click;
+            contextMenuStrip.Items.Add(physicToolStripMenuItem);
+
+            ToolStripMenuItem exitToolStripMenuItem = new ToolStripMenuItem();
+            exitToolStripMenuItem.Text = "終了";
+            exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
+            contextMenuStrip.Items.Add(exitToolStripMenuItem);
 
             notify_icon.ContextMenuStrip = contextMenuStrip;
 
@@ -121,12 +168,12 @@ namespace DesktopMascot
             }
         }
 
-        private void ChangeModel(string model_path)
+        public static void ChangeModel(string model_path)
         {
             modelHandle = DX.MV1LoadModel(model_path);
         }
 
-        private void ChangeMotion(string motion_path)
+        public static void ChangeMotion(string motion_path)
         {
             //
         }
@@ -154,35 +201,35 @@ namespace DesktopMascot
             Application.Exit();
         }
 
-         private void CameraToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CameraToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CameraDialog cdialog = new CameraDialog();
             cdialog.Show();             // Show the dialog window for setting camera works
         }
 
+        private void ModelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ModelDialog mddialog = new ModelDialog();
+            mddialog.Show();             // Show the dialog window to select the motion
+        }
+
+        private void MotionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MotionDialog mtdialog = new MotionDialog();
+            mtdialog.Show();             // Show the dialog window to selkect the model
+        }
+
+        private void PhysicToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PhysicDialog pdialog = new PhysicDialog();
+            pdialog.Show();             // Show dialog window to set the physics calc. mode
+        }
+
         /*
-        private void motionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Dialog_Motions dialog1 = new Dialog_Motions();
-            dialog1.Show();             // Show the dialog window to select the motion
-        }
-
-        private void modelsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Dialog_Models dialog1 = new Dialog_Models();
-            dialog1.Show();             // Show the dialog window to selkect the model
-        }
-
         private void topMostToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Dialog_DisplayMode dialog1 = new Dialog_DisplayMode();
             dialog1.Show();             // Show dialog window to set the top most display
-        }
-
-        private void physicsCalcToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Dialog_PhysicsMode dialog1 = new Dialog_PhysicsMode();
-            dialog1.Show();             // Show dialog window to set the physics calc. mode
         }
 
         private void settingWindowPosToolStripMenuItem_Click(object sender, EventArgs e)

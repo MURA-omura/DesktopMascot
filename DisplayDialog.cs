@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace DesktopMascot
 {
-    class DisplayDialog : Form
+    sealed class DisplayDialog : Form
     {
         public DisplayDialog()
         {

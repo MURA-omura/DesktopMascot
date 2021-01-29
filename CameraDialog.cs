@@ -5,7 +5,7 @@ using DxLibDLL;
 
 namespace DesktopMascot
 {
-    class CameraDialog : Form
+    sealed class CameraDialog : Form
     {
         Label label_dist;
         Label label_theta;
@@ -112,7 +112,7 @@ namespace DesktopMascot
             };
             close_button.Click += new EventHandler(Close_Button_CLicked);
 
-            this.Controls.AddRange(new Control[] {
+            Controls.AddRange(new Control[] {
                 label_dist, label_theta, label_phi, textBox_dist, trackbar_dist,
                 textBox_theta, trackbar_theta, textBox_phi, trackbar_phi, close_button
             });
