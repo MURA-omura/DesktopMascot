@@ -17,6 +17,8 @@ namespace DesktopMascot
         public static float camera_phi = 0.0f;
 
         public static int phy_mode = 0;
+        public static bool dsp_flag = false;
+        public static bool dsp_change_flag = false;
 
         private bool mouse_flag = false;
         private int mouse_orgX;
@@ -75,6 +77,12 @@ namespace DesktopMascot
             //totalTime = DX.MV1GetAttachAnimTotalTime(modelHandle, attachIndex);
         }
 
+        private void SetDspMode()
+        {
+            TopMost = dsp_flag;
+            dsp_change_flag = false;
+        }
+
         private void SetComponents()
         {
             notify_icon = new NotifyIcon();
@@ -108,6 +116,11 @@ namespace DesktopMascot
             physicToolStripMenuItem.Click += PhysicToolStripMenuItem_Click;
             contextMenuStrip.Items.Add(physicToolStripMenuItem);
 
+            ToolStripMenuItem displayToolStripMenuItem = new ToolStripMenuItem();
+            displayToolStripMenuItem.Text = "ディスプレイ";
+            displayToolStripMenuItem.Click += DisplayToolStripMenuItem_Click;
+            contextMenuStrip.Items.Add(displayToolStripMenuItem);
+
             ToolStripMenuItem exitToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem.Text = "終了";
             exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
@@ -124,6 +137,7 @@ namespace DesktopMascot
             DX.ClearDrawScreen(); //裏画面を消す
             DX.DrawBox(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, DX.GetColor(1, 1, 1), DX.TRUE); //背景を設定(透過させる)
 
+            if (dsp_change_flag) SetDspMode();
             MoveModel();
             DX.MV1DrawModel(modelHandle); //3Dモデルの描画
 
@@ -225,29 +239,10 @@ namespace DesktopMascot
             pdialog.Show();             // Show dialog window to set the physics calc. mode
         }
 
-        /*
-        private void topMostToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DisplayToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Dialog_DisplayMode dialog1 = new Dialog_DisplayMode();
-            dialog1.Show();             // Show dialog window to set the top most display
+            DisplayDialog ddialog = new DisplayDialog();
+            ddialog.Show();             // Show dialog window to set the physics calc. mode
         }
-
-        private void settingWindowPosToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Dialog_WindowPos dialog1 = new Dialog_WindowPos();
-            DialogResult result = dialog1.ShowDialog();         // Show dialog window to set the position for the dialog window
-            if (result == DialogResult.OK)
-            {
-                WinPos_X = int.Parse(dialog1.textBox_X.Text);
-                WinPos_Y = int.Parse(dialog1.textBox_Y.Text);
-            }
-        }
-
-        private void scheduleToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Dialog_Schedule dialog1 = new Dialog_Schedule();
-            dialog1.Show();             // Show dialog window to set the motion speed
-        }
-        */
     }
 }
