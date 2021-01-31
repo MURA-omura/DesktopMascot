@@ -31,7 +31,7 @@ namespace DesktopMascot
             label_file = new Label()
             {
                 Location = new Point(20, 100),
-                Text = "",
+                Text = Form1.model_path,
                 Size = new Size(200, 24),
             };
             button_open = new Button()
@@ -64,8 +64,10 @@ namespace DesktopMascot
             // ダイアログの表示
             if (ofDialog.ShowDialog() == DialogResult.OK)
             {
-                Form1.ChangeModel(ofDialog.FileName);
                 label_file.Text = ofDialog.FileName;
+                Form1.ChangeModel(label_file.Text);
+                TextIO tio = new TextIO();
+                tio.SetModelPath(label_file.Text);
             }
             ofDialog.Dispose();
         }

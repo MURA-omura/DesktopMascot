@@ -10,7 +10,7 @@ namespace DesktopMascot
         private NotifyIcon notify_icon;
 
         private static int modelHandle;
-        private static string model_path;
+        public static string model_path;
 
         public static float camera_dist = 50.0f;
         public static float camera_theta = 0.0f;
@@ -44,7 +44,9 @@ namespace DesktopMascot
             DX.DxLib_Init(); //DxLibの初期化処理
             DX.SetDrawScreen(DX.DX_SCREEN_BACK); //描画先を裏画面に設定
 
-            model_path = "Data/さくらみこ2公式mmd_ver1.0/さくらみこ2.pmx";
+            //model_path = "Data/さくらみこ2公式mmd_ver1.0/さくらみこ2.pmx";
+            TextIO tio = new TextIO();
+            model_path = tio.GetModelPath();
             modelHandle = DX.MV1LoadModel(model_path); //3Dモデルの読み込み
 
             DX.SetCameraNearFar(0.1f, 1000.0f); //奥行0.1～1000をカメラの描画範囲とする
@@ -182,8 +184,10 @@ namespace DesktopMascot
             }
         }
 
-        public static void ChangeModel(string model_path)
+        public static void ChangeModel(string path)
         {
+            model_path = path;
+            DX.MV1DeleteModel(modelHandle);
             modelHandle = DX.MV1LoadModel(model_path);
         }
 
